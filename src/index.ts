@@ -111,6 +111,26 @@ server.tool(
   }
 );
 
+server.tool(
+  "get_activity_timeseries",
+  "Get normalized activity timeseries over a time window (max 6 hours). Shows activity intensity over time.",
+  {
+    user_id: z.string().describe("Sensr user ID"),
+    start_timestamp: z.number().describe("Start time in epoch milliseconds"),
+    end_timestamp: z.number().describe("End time in epoch milliseconds (max 6h window)"),
+    timezone_offset_mins: z.number().optional().describe("User timezone offset in minutes (e.g. -360 for CST)"),
+  },
+  async ({ user_id, start_timestamp, end_timestamp, timezone_offset_mins }) => {
+    const data = await client.getActivityTimeseries({
+      userId: user_id,
+      startTimestamp: start_timestamp,
+      endTimestamp: end_timestamp,
+      timezoneOffsetMins: timezone_offset_mins,
+    });
+    return { content: [{ type: "text", text: formatResult(data) }] };
+  }
+);
+
 // --- Sleep ---
 
 server.tool(

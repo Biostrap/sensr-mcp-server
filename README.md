@@ -10,6 +10,7 @@ A [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server for the
 | `get_user_ids` | Get all user IDs (lightweight) |
 | `get_biometrics` | Paginated biometric readings (HR, HRV, SpO2, respiratory rate) |
 | `get_biometrics_timeseries` | Continuous biometric timeseries for a metric (max 6h window) |
+| `get_activity_timeseries` | Normalized activity intensity timeseries (max 6h window) |
 | `get_sleep` | Sleep data: stages, durations, biometrics, score, disturbances, debt |
 | `get_sleep_trend` | Aggregated sleep data (week/month/year) |
 | `get_activities` | Workout data: exercises, reps, calories, duration, scores |

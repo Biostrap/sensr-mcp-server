@@ -109,13 +109,26 @@ export class SensrClient {
     }
     const params: Record<string, string | number | undefined> = {
       user_id: opts.userId,
-      start_timestamp: opts.startTimestamp,
-      end_timestamp: opts.endTimestamp,
+      start_timestamp_ms: opts.startTimestamp,
+      end_timestamp_ms: opts.endTimestamp,
     };
     if (opts.metric) {
-      params.metric = opts.metric;
+      params.metric_filter = opts.metric;
     }
-    return this.request("/v1/biometrics/timeseries", params);
+    return this.request("/v1/timeseries/biometrics/cm", params);
+  }
+
+  async getActivityTimeseries(opts: Omit<TimeseriesRequest, "metric"> & { timezoneOffsetMins?: number }): Promise<any> {
+    const windowMs = opts.endTimestamp - opts.startTimestamp;
+    if (windowMs > 6 * 60 * 60 * 1000) {
+      throw new Error("Timeseries window cannot exceed 6 hours. Split into smaller requests.");
+    }
+    return this.request("/v1/timeseries/activity-normalized", {
+      user_id: opts.userId,
+      start_timestamp_ms: opts.startTimestamp,
+      end_timestamp_ms: opts.endTimestamp,
+      timezone_offset_mins: opts.timezoneOffsetMins,
+    });
   }
 
   // ── Sleep ──
