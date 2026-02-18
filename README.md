@@ -91,7 +91,9 @@ This server wraps the [Sensr Developers API](https://developers.getsensr.io/) v1
 
 ### Authentication
 
-Uses Organization API Key authentication (`Authorization: APIKey <key>`). All data endpoints require a `user_id` parameter to specify which user's data to access.
+Uses Organization API Key authentication (`Authorization: APIKey <key>`). Generate one from [platform.getsensr.io](https://platform.getsensr.io) > Developers. All data endpoints require a `user_id` parameter to specify which user's data to access.
+
+> **Note:** The Sensr auth server does not support `authorization_code` grant for external OAuth2 apps. Org API Key is the only supported auth method for third-party integrations.
 
 ## License
 
