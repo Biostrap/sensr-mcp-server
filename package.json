@@ -1,0 +1,40 @@
+{
+  "name": "@sensrbio/mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for the Sensr Bio wearable platform API. Access biometrics, sleep, activity, scores, calories, and device data via the Model Context Protocol.",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "sensr-mcp-server": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsc --watch"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "sensr",
+    "biostrap",
+    "wearable",
+    "biometrics",
+    "health",
+    "sleep",
+    "hrv",
+    "heart-rate"
+  ],
+  "author": "Sensr Bio",
+  "license": "MIT",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.11.0",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "typescript": "^5.7.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
