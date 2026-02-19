@@ -63,19 +63,34 @@ export class SensrClient {
 
     const response = await fetch(url.toString(), {
       headers: {
-        Authorization: `APIKey ${this.apiKey}`,
+        "X-API-KEY": this.apiKey,
+        "Content-Type": "application/json",
       },
     });
 
-    const data = await response.json();
+    const text = await response.text();
 
     if (!response.ok) {
-      const errors = (data as any).errors;
-      const msg = errors?.[0]?.title || errors?.[0]?.detail || `HTTP ${response.status}`;
+      let msg = `HTTP ${response.status}`;
+      if (text) {
+        try {
+          const errorData = JSON.parse(text);
+          const errors = errorData?.errors;
+          msg = errors?.[0]?.title || errors?.[0]?.detail || errorData?.message || msg;
+        } catch {
+          msg = `HTTP ${response.status}: ${text.slice(0, 200)}`;
+        }
+      }
       throw new Error(`Sensr API error: ${msg}`);
     }
 
-    return data;
+    if (!text) return {};
+
+    try {
+      return JSON.parse(text);
+    } catch {
+      throw new Error(`Sensr API returned invalid JSON for ${path}: ${text.slice(0, 200)}`);
+    }
   }
 
   // ── Organization ──
@@ -83,8 +98,8 @@ export class SensrClient {
   async getOrgUsers(opts: OrgUsersRequest = {}): Promise<any> {
     return this.request("/v1/organizations/users", {
       page: opts.page ?? 1,
-      limit: opts.limit ?? 100,
-      search: opts.search,
+      items_per_page: opts.limit ?? 100,
+      q: opts.search,
     });
   }
 
@@ -208,18 +223,28 @@ export class SensrClient {
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        Authorization: `APIKey ${this.apiKey}`,
+        "X-API-KEY": this.apiKey,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
     });
 
-    const data = await response.json();
+    const text = await response.text();
     if (!response.ok) {
-      const errors = (data as any).errors;
-      throw new Error(`Sensr API error: ${errors?.[0]?.title || `HTTP ${response.status}`}`);
+      let msg = `HTTP ${response.status}`;
+      if (text) {
+        try {
+          const errorData = JSON.parse(text);
+          msg = errorData?.errors?.[0]?.title || errorData?.message || msg;
+        } catch {
+          msg = `HTTP ${response.status}: ${text.slice(0, 200)}`;
+        }
+      }
+      throw new Error(`Sensr API error: ${msg}`);
     }
-    return data;
+
+    if (!text) return {};
+    return JSON.parse(text);
   }
 
   async getJobStatus(jobId: string): Promise<any> {
