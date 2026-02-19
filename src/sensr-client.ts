@@ -64,6 +64,8 @@ export class SensrClient {
     const response = await fetch(url.toString(), {
       headers: {
         Authorization: `APIKey ${this.apiKey}`,
+        Accept: "application/json",
+        "User-Agent": "sensorbio-mcp-server/1.0.4",
       },
     });
 
@@ -80,7 +82,10 @@ export class SensrClient {
           msg = `HTTP ${response.status}: ${text.slice(0, 200)}`;
         }
       }
-      throw new Error(`Sensr API error: ${msg}`);
+
+      // Include endpoint + short body snippet to make WAF/proxy errors debuggable.
+      const debug = text ? ` | body: ${text.slice(0, 200)}` : "";
+      throw new Error(`Sensr API error: ${msg} | endpoint: ${url.pathname}${debug}`);
     }
 
     if (!text) return {};
