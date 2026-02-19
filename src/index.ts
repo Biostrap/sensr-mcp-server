@@ -43,6 +43,25 @@ function formatResult(data: unknown): string {
 
 // ── Tools ──
 
+// --- Debug ---
+
+server.tool(
+  "debug_request",
+  "Debug a raw Sensr API GET request. Returns status, selected headers, and a body preview (no secrets).",
+  {
+    path: z.string().describe("API path starting with /v1/... e.g. /v1/organizations/users/ids"),
+    query: z.record(z.string(), z.string()).optional().describe("Optional query params as key/value strings"),
+  },
+  async ({ path, query }) => {
+    const q: Record<string, string> = {};
+    if (query) {
+      for (const [k, v] of Object.entries(query)) q[k] = String(v);
+    }
+    const result = await client.debugGet(path, q);
+    return { content: [{ type: "text", text: JSON.stringify(result, null, 2) }] };
+  }
+);
+
 // --- Org Management ---
 
 server.tool(

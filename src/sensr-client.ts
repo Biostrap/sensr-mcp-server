@@ -48,6 +48,14 @@ export interface OrgUsersRequest {
   search?: string;
 }
 
+export interface DebugResult {
+  ok: boolean;
+  endpoint: string;
+  status: number;
+  headers: Record<string, string | string[] | undefined>;
+  body_preview: string;
+}
+
 export class SensrClient {
   private apiKey: string;
 
@@ -106,6 +114,47 @@ export class SensrClient {
       return JSON.parse(text);
     } catch {
       throw new Error(`Sensr API returned invalid JSON for ${path}: ${text.slice(0, 200)}`);
+    }
+  }
+
+  async debugGet(path: string, query: Record<string, string> = {}): Promise<DebugResult> {
+    const url = new URL(`${BASE_URL}${path}`);
+    for (const [k, v] of Object.entries(query)) url.searchParams.set(k, v);
+
+    try {
+      const resp = await httpsRequest({
+        url: url.toString(),
+        method: "GET",
+        headers: {
+          Authorization: `APIKey ${this.apiKey}`,
+          Accept: "application/json",
+          "Accept-Encoding": "identity",
+          "User-Agent": "sensorbio-mcp-server/1.0.9",
+          Connection: "close",
+        },
+      });
+
+      const interesting = ["server", "via", "cf-ray", "x-request-id", "x-amz-cf-id", "x-cache", "content-type", "date"];
+      const headers: Record<string, string | string[] | undefined> = {};
+      for (const [k, v] of Object.entries(resp.headers)) {
+        if (interesting.includes(k.toLowerCase())) headers[k] = v;
+      }
+
+      return {
+        ok: resp.status >= 200 && resp.status < 300,
+        endpoint: url.pathname + url.search,
+        status: resp.status,
+        headers,
+        body_preview: (resp.bodyText ?? "").slice(0, 4000),
+      };
+    } catch (err: any) {
+      return {
+        ok: false,
+        endpoint: url.pathname + url.search,
+        status: 0,
+        headers: {},
+        body_preview: String(err?.stack ?? err),
+      };
     }
   }
 
