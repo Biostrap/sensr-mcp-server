@@ -65,7 +65,12 @@ export class SensrClient {
       headers: {
         Authorization: `APIKey ${this.apiKey}`,
         Accept: "application/json",
-        "User-Agent": "sensorbio-mcp-server/1.0.4",
+        // Avoid content-coding negotiation that can trigger edge/WAF weirdness.
+        "Accept-Encoding": "identity",
+        // Stable UA for allowlisting/debug.
+        "User-Agent": "sensorbio-mcp-server/1.0.7",
+        // Optional: mimic curl-ish connection behavior.
+        Connection: "close",
       },
     });
 
@@ -83,9 +88,15 @@ export class SensrClient {
         }
       }
 
-      // Include endpoint + short body snippet to make WAF/proxy errors debuggable.
-      const debug = text ? ` | body: ${text.slice(0, 200)}` : "";
-      throw new Error(`Sensr API error: ${msg} | endpoint: ${url.pathname}${debug}`);
+      // Include endpoint + response headers + short body snippet to make WAF/proxy errors debuggable.
+      const headerEntries = Array.from(response.headers.entries());
+      const headerStr = headerEntries
+        .filter(([k]) => ["server", "via", "cf-ray", "x-request-id", "x-amz-cf-id", "x-cache", "content-type"].includes(k.toLowerCase()))
+        .map(([k, v]) => `${k}: ${v}`)
+        .join("; ");
+      const debug = text ? ` | body: ${text.slice(0, 500)}` : "";
+      const hdr = headerStr ? ` | headers: ${headerStr}` : "";
+      throw new Error(`Sensr API error: ${msg} | endpoint: ${url.pathname}${hdr}${debug}`);
     }
 
     if (!text) return {};
