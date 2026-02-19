@@ -1,10 +1,11 @@
 {
   "name": "sensorbio-mcp-server",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "MCP server for the SensorBio wearable platform API. Access biometrics, sleep, activity, scores, calories, and device data via the Model Context Protocol.",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
+    "sensorbio-mcp-server": "dist/index.js",
     "sensr-mcp-server": "dist/index.js"
   },
   "scripts": {
