@@ -3,6 +3,8 @@
  * Wraps the Sensr Developers API (api.getsensr.io) v1.3.1
  */
 
+import { httpsRequest } from "./http.js";
+
 const BASE_URL = "https://api.getsensr.io";
 
 export interface SensrClientConfig {
@@ -61,40 +63,39 @@ export class SensrClient {
       }
     }
 
-    const response = await fetch(url.toString(), {
+    const resp = await httpsRequest({
+      url: url.toString(),
+      method: "GET",
       headers: {
         Authorization: `APIKey ${this.apiKey}`,
         Accept: "application/json",
-        // Avoid content-coding negotiation that can trigger edge/WAF weirdness.
         "Accept-Encoding": "identity",
-        // Stable UA for allowlisting/debug.
-        "User-Agent": "sensorbio-mcp-server/1.0.7",
-        // Optional: mimic curl-ish connection behavior.
+        "User-Agent": "sensorbio-mcp-server/1.0.8",
         Connection: "close",
       },
     });
 
-    const text = await response.text();
+    const text = resp.bodyText;
 
-    if (!response.ok) {
-      let msg = `HTTP ${response.status}`;
+    if (resp.status < 200 || resp.status >= 300) {
+      let msg = `HTTP ${resp.status}`;
       if (text) {
         try {
           const errorData = JSON.parse(text);
           const errors = errorData?.errors;
           msg = errors?.[0]?.title || errors?.[0]?.detail || errorData?.message || msg;
         } catch {
-          msg = `HTTP ${response.status}: ${text.slice(0, 200)}`;
+          msg = `HTTP ${resp.status}: ${text.slice(0, 200)}`;
         }
       }
 
-      // Include endpoint + response headers + short body snippet to make WAF/proxy errors debuggable.
-      const headerEntries = Array.from(response.headers.entries());
-      const headerStr = headerEntries
-        .filter(([k]) => ["server", "via", "cf-ray", "x-request-id", "x-amz-cf-id", "x-cache", "content-type"].includes(k.toLowerCase()))
-        .map(([k, v]) => `${k}: ${v}`)
+      const interesting = ["server", "via", "cf-ray", "x-request-id", "x-amz-cf-id", "x-cache", "content-type"];
+      const headerStr = Object.entries(resp.headers)
+        .filter(([k]) => interesting.includes(k.toLowerCase()))
+        .map(([k, v]) => `${k}: ${Array.isArray(v) ? v.join(",") : v}`)
         .join("; ");
-      const debug = text ? ` | body: ${text.slice(0, 500)}` : "";
+
+      const debug = text ? ` | body: ${text.slice(0, 2000)}` : "";
       const hdr = headerStr ? ` | headers: ${headerStr}` : "";
       throw new Error(`Sensr API error: ${msg} | endpoint: ${url.pathname}${hdr}${debug}`);
     }
