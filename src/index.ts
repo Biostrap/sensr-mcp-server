@@ -16,6 +16,7 @@ import { SensrClient } from "./sensr-client.js";
 // ── Config ──
 
 const API_KEY = process.env.SENSR_API_KEY;
+console.error(`[sensr-bio] SENSR_API_KEY length: ${API_KEY?.length ?? 0}`);
 if (!API_KEY) {
   console.error("SENSR_API_KEY environment variable is required");
   process.exit(1);
