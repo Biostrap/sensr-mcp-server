@@ -1,7 +1,7 @@
 {
-  "name": "@sensrbio/mcp-server",
-  "version": "1.0.0",
-  "description": "MCP server for the Sensr Bio wearable platform API. Access biometrics, sleep, activity, scores, calories, and device data via the Model Context Protocol.",
+  "name": "sensorbio-mcp-server",
+  "version": "1.0.1",
+  "description": "MCP server for the SensorBio wearable platform API. Access biometrics, sleep, activity, scores, calories, and device data via the Model Context Protocol.",
   "type": "module",
   "main": "dist/index.js",
   "bin": {
@@ -36,5 +36,16 @@
   },
   "engines": {
     "node": ">=18.0.0"
-  }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Biostrap/sensr-mcp-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Biostrap/sensr-mcp-server/issues"
+  },
+  "homepage": "https://github.com/Biostrap/sensr-mcp-server#readme"
 }

@@ -1,6 +1,6 @@
-# Sensr Bio MCP Server
+# SensorBio MCP Server
 
-A [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server for the [Sensr Bio](https://getsensr.io) wearable platform API. Gives AI assistants access to real-time biometric, sleep, activity, and health score data from Sensr wearable devices.
+A [Model Context Protocol](https://modelcontextprotocol.io) (MCP) server for the **SensorBio** wearable platform API (api.getsensr.io). Gives AI assistants access to real-time biometric, sleep, activity, and health score data from Sensr wearable devices.
 
 ## Tools
 
