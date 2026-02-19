@@ -63,8 +63,7 @@ export class SensrClient {
 
     const response = await fetch(url.toString(), {
       headers: {
-        "X-API-KEY": this.apiKey,
-        "Content-Type": "application/json",
+        Authorization: `APIKey ${this.apiKey}`,
       },
     });
 
@@ -223,7 +222,7 @@ export class SensrClient {
     const response = await fetch(url, {
       method: "POST",
       headers: {
-        "X-API-KEY": this.apiKey,
+        Authorization: `APIKey ${this.apiKey}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
